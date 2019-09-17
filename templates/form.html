@@ -1,0 +1,52 @@
+<html>
+    
+    <body>
+        <video id="player" controls autoplay></video>
+<button id="capture">Capture</button>
+<canvas id="canvas" width=320 height=240></canvas>
+<div>User Story: <span id="story-number"></span></div>
+<script>
+  const player = document.getElementById('player');
+  const canvas = document.getElementById('canvas');
+  const context = canvas.getContext('2d');
+  const captureButton = document.getElementById('capture');
+
+  const constraints = {
+    video: true,
+  };
+
+  captureButton.addEventListener('click', () => {
+    // Draw the video frame to the canvas.
+    context.drawImage(player, 0, 0, canvas.width, canvas.height);
+    
+    var dataURL = canvas.toDataURL();
+    upload(dataURL)
+    console.info(dataURL)
+  });
+  
+  function upload(file) {
+  fetch('/', { // Your POST endpoint
+    method: 'POST',
+    body: file // This is your file object
+  }).then(
+    response => response.json() // if the response is a JSON object
+  ).then(
+    success => {
+      console.info(success)
+      document.getElementById("story-number").innerHTML = success.detection.TextDetections[0].DetectedText// Handle the success response object
+    }
+  ).catch(
+    error => console.log(error) // Handle the error response object
+  );
+};
+
+  // Attach the video stream to the video element and autoplay.
+  navigator.mediaDevices.getUserMedia(constraints)
+    .then((stream) => {
+      player.srcObject = stream;
+    });
+</script>
+
+    </body>
+    
+</html>
